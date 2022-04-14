@@ -1,0 +1,38 @@
+version: "3.9"
+services:
+  opendistro:
+    container_name: opendistro
+    image: amazon/opendistro-for-elasticsearch:1.13.3
+    ports:
+      - 9200:9200
+      - 9600:9600
+    restart: always
+    environment:
+      - "discovery.type=single-node"
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    volumes:
+      - opendistro-data:/usr/share/elasticsearch/data
+    networks:
+      - opendistro
+  kibana:
+    container_name: kibana
+    image: amazon/opendistro-for-elasticsearch-kibana:latest
+    ports:
+      - 5601:5601
+    restart: always
+    environment:
+      - "ELASTICSEARCH_URL=https://opendistro:9200"
+      - "ELASTICSEARCH_HOSTS=https://opendistro:9200"
+    networks:
+      - opendistro
+
+volumes:
+  opendistro-data:
+networks:
+  opendistro:
+    driver: bridge
+    attachable: true
+
+#docker run -p 9200:9200 -p 9600:9600 -e "discovery.type=single-node" amazon/opendistro-for-elasticsearch:1.13.3
+#docker run -dp 5601:5601 -e ELASTICSEARCH_URL=https://opendistro:9200 -e ELASTICSEARCH_HOSTS=https://opendistro:9200 --network opendistro --name kibana amazon/opendsitro-for-elasticsearch-kibana:latest
+
